@@ -1,20 +1,28 @@
 name = "PhotoAcoustic"
 uuid = "86b14aa7-fcb7-4836-b4c7-056f45a9c77b"
 authors = ["rafaelorozco <rao9787@gmail.com>", "Mathias Louboutin <mathias.louboutin@gmail.com"]
-version = "0.4.2"
+version = "0.5.0"
 
 [deps]
+DSP = "717857b8-e6f2-59f4-9121-6e50c889abd2"
+FFTW = "7a1cc6ca-52ef-59f5-83cd-3a7055c09341"
 FourierTools = "b18b359b-aebc-45ac-a139-9c0ccbb2871e"
+JOLI = "bb331ad6-a1cf-11e9-23da-9bcb53c69f6f"
 JUDI = "f3b833dc-6b2e-5b9c-b940-873ed6319979"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+PythonCall = "6099a3de-0909-46bc-b1f4-468b9a2dfc0d"
 Reexport = "189a3867-3050-52da-a836-e630ba90ab69"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [compat]
-JUDI = "^3.2.1"
-FourierTools = "0.3,0.4"
+DSP = "0.7, 0.8"
+FFTW = "1"
+FourierTools = "0.3, 0.4"
+JOLI = "0.9"
+JUDI = "4.1"
+PythonCall = "0.9"
 Reexport = "1"
-julia = "1.6"
+julia = "1.10"
 
 [extras]
 Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"

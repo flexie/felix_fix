@@ -195,8 +195,8 @@ function _augment_data(q::Matrix{T},  G::TransducerGeometry{T, D}) where {T, D}
 end
 
 # Modeling output
-post_process(v::AbstractArray, modelPy::PyObject, ::Val{:forward}, G::TransducerGeometry, options::JUDIOptions) =
+post_process(v::AbstractArray, modelPy::Py, ::Val{:forward}, G::TransducerGeometry, ::Any, options::JUDIOptions) =
     adjoint_transducer(G, time_resample(v, calculate_dt(modelPy), G.geometry))
 
-post_process(v::AbstractArray, modelPy::PyObject, ::Val{:adjoint}, G::TransducerGeometry, options::JUDIOptions) =
+post_process(v::AbstractArray, modelPy::Py, ::Val{:adjoint}, G::TransducerGeometry, ::Any, options::JUDIOptions) =
     adjoint_transducer(G, time_resample(v, calculate_dt(modelPy), G.geometry))

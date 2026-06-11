@@ -24,7 +24,7 @@ jobs:
       fail-fast: false
 
       matrix:
-        version: ['1.6', '1.7', '1.8', '1']
+        version: ['1.10', '1']
         os: [ubuntu-latest]
         include:
           - os: macos-latest
@@ -32,13 +32,12 @@ jobs:
 
     steps:
       - name: Checkout PhotoAcoustic
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup julia
-        uses: julia-actions/setup-julia@v1
+        uses: julia-actions/setup-julia@v2
         with:
           version: ${{ matrix.version }}
-          arch: x64
 
       - name: Install GCC 9
         if : runner.os == 'macOS'
@@ -49,7 +48,7 @@ jobs:
 
       - name: Install Examples packages
         run: |
-          julia -e 'using Pkg;Pkg.add(["Statistics", "LinearAlgebra", "PyPlot", "IterativeSolvers"])'
+          julia -e 'using Pkg;Pkg.add(["Statistics", "LinearAlgebra", "PythonPlot", "IterativeSolvers"])'
 
       - name: Run examples
         run: |

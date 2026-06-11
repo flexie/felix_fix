@@ -1,5 +1,5 @@
 using PhotoAcoustic
-using Statistics, LinearAlgebra, PyPlot
+using Statistics, LinearAlgebra, PythonPlot
 
 # Set up model structure
 n = (80, 80)   # (x,y,z) or (x,z)

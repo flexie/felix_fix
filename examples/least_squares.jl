@@ -1,4 +1,4 @@
-using PhotoAcoustic, LinearAlgebra, PyPlot
+using PhotoAcoustic, LinearAlgebra, PythonPlot
 using Statistics, IterativeSolvers
 
 # Set up model structure

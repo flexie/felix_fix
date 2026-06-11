@@ -6,22 +6,25 @@ using LinearAlgebra, Reexport
 
 PhotoAcoustic_path = dirname(pathof(PhotoAcoustic))
 
-using JUDI.DSP, JUDI.PyCall, JUDI.FFTW, JUDI.JOLI
+using DSP, PythonCall, FFTW, JOLI
 using FourierTools
 
 import Base: getindex, *, copy!, copyto!, similar, getproperty, display
 import JUDI: judiMultiSourceVector, judiComposedPropagator, judiPropagator, judiNoopOperator
-import JUDI: judiDataModeling, judiModeling, jAdjoint, Projection, judiVector, Geometry
+import JUDI: judiDataModeling, judiModeling, judiJacobian, jAdjoint, Projection, judiVector, Geometry
+import JUDI: judiProjection, JUDIOptions, Options, PhysicalParameter, AbstractSize, AbstractModel
 import JUDI: RangeOrVec, make_input, propagate, zero, process_input_data, setup_grid
-import JUDI: wrapcall_data, wrapcall_function, compute_illum, wrapcall_weights
-import JUDI: time_resample, make_src, get_nsrc, filter_none
+import JUDI: wrapcall_data, compute_illum, devito_model, remove_padding, pad_array
+import JUDI: time_resample, make_src, get_nsrc, n_samples, calculate_dt, post_process
+import PythonCall: Py, pyconvert, pyimport
+import JUDI: space_src, time_space, time_space_src, rec_space, space
 import LinearAlgebra: adjoint
 
-const impl = PyNULL()
+const impl = PythonCall.pynew()
 
 function __init__()
-    pushfirst!(PyVector(pyimport("sys")."path"),PhotoAcoustic_path)
-    copy!(impl, pyimport("implementation"))
+    pyimport("sys").path.insert(0, PhotoAcoustic_path)
+    PythonCall.pycopy!(impl, pyimport("implementation"))
 end
 
 # utility for data loading 

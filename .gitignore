@@ -1,0 +1,5 @@
+Manifest.toml
+.CondaPkg/
+__pycache__/
+*.pyc
+Claude.md

@@ -2,7 +2,7 @@ using DrWatson
 
 using JLD2
 using PhotoAcoustic
-using Statistics, LinearAlgebra, PyPlot
+using Statistics, LinearAlgebra, PythonPlot
 using Images 
 using Distributions 
 using Random 

@@ -18,7 +18,7 @@ dobs = F*w
         J = judiJacobian(F0, w)
 
         # Linear modeling
-        dD = J*vec(dm)
+        dD = J*dm
 
         # Gradient test
         grad_test(x-> F(;m=x)*w, m0, dm, dD; data=true)
@@ -67,7 +67,7 @@ end
             q = rand(Float32, model.n...)
             q_rand = judiInitialState(q)
 
-            adj_F, adj_J = run_adjoint(A, q_rand, y, vec(dm); test_F=!adj_F, test_J=!adj_J)
+            adj_F, adj_J = run_adjoint(A, q_rand, y, dm; test_F=!adj_F, test_J=!adj_J)
             ntry +=1
             test_adjoint(adj_F, adj_J, ntry==maxtry)
         end

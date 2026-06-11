@@ -1,5 +1,5 @@
 using PhotoAcoustic
-using Statistics, LinearAlgebra, PyPlot
+using Statistics, LinearAlgebra, PythonPlot
 
 function plot_3d_mip(p_array, title_plt;dx=0.0678f0, vmin_po=0, vmax_po=nothing)
 
