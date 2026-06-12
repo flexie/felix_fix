@@ -85,11 +85,15 @@ def adjointis(model, y, rcv_coords, **kwargs):
     kwargs.pop('t_sub', None)
     kwargs.pop('ic', None)
 
-    # Run adjoint simulation with JUDI
+    # Run adjoint simulation with JUDI. Force return_op so we get (op, uout, rout, kw)
+    # — JUDI 4's forward otherwise returns (rout, uout, I, summary) at the same arity,
+    # which would bind `summary` into `kw` and break the kw['v'] lookup below.
     kwargs['fw'] = False
-    op, v, rcv, kw = forward(model, rcv_coords, None, -y, **kwargs)
-    # Take the time-stepped wavefield (v) directly from kw — `v` (the returned uout)
-    # may be a DFT-mode tuple in some configurations.
+    kwargs['return_op'] = True
+    op, _uout, _rcv, kw = forward(model, rcv_coords, None, -y, **kwargs)
+    op(**kw)
+
+    # The time-stepped wavefield is stored in kw under its name ("v" for fw=False).
     v = kw['v']
 
     # Extract time derivative at 0.
@@ -97,9 +101,8 @@ def adjointis(model, y, rcv_coords, **kwargs):
 
     # Correct for default scaling in injection
     mrm = model.m * model.irho
-    op = Operator(Eq(init, mrm * v.dt))
-    op(dt=model.critical_dt, time_m=0, time_M=0)
-
+    op0 = Operator(Eq(init, mrm * v.dt))
+    op0(dt=model.critical_dt, time_m=0, time_M=0)
 
     I = kw.get('Iv', None)
     return init.data, getattr(I, "data", None)
