@@ -58,6 +58,7 @@ w = judiInitialState(w)
 
 #####  Run tests
 
+include("test_utils.jl")
 include("test_all_options.jl")
 include("test_sensitivities.jl")
 

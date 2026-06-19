@@ -33,7 +33,9 @@ function circle_geometry(center::NTuple{3, T}, r, numpoints::Integer) where T
     st, ct = first.(sct), last.(sct)
     scp = sincos.(phi)
     sp, cp = first.(scp), last.(scp)
-    Float32.(cx .- r*vec(ct*sp')), Float32.(cy .- r*vec(st*sp')), Float32.(cz .- r*vec(cp')), (theta, phi)
+    # z depends only on phi; broadcast it across theta so all three coordinate
+    # arrays end up the same numpoints^2 length.
+    Float32.(cx .- r*vec(ct*sp')), Float32.(cy .- r*vec(st*sp')), Float32.(cz .- r*vec(ones(eltype(cp), numpoints)*cp')), (theta, phi)
 end
 
 """
@@ -75,8 +77,12 @@ function blackman_upscale(p0::Array{T, N}, d::NTuple{N, T}, upsample_fact=1.25; 
     #smooth p0 using blackman filter
     window = Float32.(blackman(N_orig; padding=0));
 
-    pad = (N_up .- N_orig) .÷ 2
-    pad = ntuple(i-> (pad[i], pad[i]), N)
+    # Centre the window inside the upsampled grid. When the size difference is
+    # odd on an axis we split it as (d÷2, d-d÷2), so the elementwise product
+    # against fft(p0_up) still lines up. On even-diff axes this collapses to
+    # the original symmetric (d÷2, d÷2) padding.
+    diff = N_up .- N_orig
+    pad  = ntuple(i -> (diff[i] ÷ 2, diff[i] - diff[i] ÷ 2), N)
 
     window_padded = pad_zeros(window, pad)
 
@@ -93,10 +99,14 @@ end
 
 function pad_zeros(m::Array{T, N}, nb::NTuple{N, NTuple{2, Int64}}) where {T, N}
     n = size(m)
-    Ei = []
     new_size = n .+ map(sum, nb)
-    for ((left, right), nn) in zip(nb, n)
-        push!(Ei, joExtend(nn, :zeros; pad_upper=right, pad_lower=left, RDT=T, DDT=T))
+    # joKron treats its trailing arg as acting on the *first* axis of vec(m)
+    # (column-major), so iterate the axes in reverse to match — see JUDI's
+    # `pad_array` for the same convention.
+    Ei = Any[]
+    for i = N:-1:1
+        left, right = nb[i]
+        push!(Ei, joExtend(n[i], :zeros; pad_upper=right, pad_lower=left, RDT=T, DDT=T))
     end
     padded = joKron(Ei...) * m[:]
     return reshape(padded, new_size)
@@ -105,10 +115,11 @@ end
 
 function unpad(m::Array{T, N}, nb::NTuple{N, NTuple{2, Int64}}) where {T, N}
     n = size(m)
-    Ei = []
     new_size = n .- map(sum, nb)
-    for ((left, right), nn) in zip(nb, new_size)
-        push!(Ei, joExtend(nn, :zeros; pad_upper=right, pad_lower=left, RDT=T, DDT=T))
+    Ei = Any[]
+    for i = N:-1:1
+        left, right = nb[i]
+        push!(Ei, joExtend(new_size[i], :zeros; pad_upper=right, pad_lower=left, RDT=T, DDT=T))
     end
     padded = joKron(Ei...)' * m[:]
     return reshape(padded, new_size)
